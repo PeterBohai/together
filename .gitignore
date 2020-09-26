@@ -10,6 +10,8 @@ node_modules
 
 # production
 /build
+secret_settings.py
+secret_settings.cpython-38.pyc
 
 # misc
 .DS_Store
