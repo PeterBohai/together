@@ -1,0 +1,113 @@
+#room-page {
+	background-color: rgb(254, 246, 250);
+}
+
+.canvas-card-wrapper {
+	width: 100;
+	height: 500px;
+}
+
+.play-text-container {
+	font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+	color: #ff0048;
+}
+
+.play-btn {
+	height: 150px;
+	border-radius: 8px;
+	border: none;
+	box-shadow: none!important;
+	background: white;
+	border-bottom: 5px solid #ff0048;
+}
+
+.play-btn:hover {
+	border-bottom:3px solid #db013f;
+}
+
+.play-btn:active {
+	border-bottom: 1px solid #be0036;
+} 
+
+.canvas-btn {
+	height: 31px;
+	padding: 3px 17px;
+	border-radius: 3px;
+	font-size: 14px;
+	font-weight: bold;
+	border: none;
+	color: white;
+	background-color: #ff0048;
+	border-bottom: 4px solid #c40138;
+}
+
+.canvas-btn:hover {
+	color: white;
+	border-bottom: 3px solid #a90231;
+}
+
+.canvas-btn:active {
+	border-bottom: 1px solid #a90231;
+} 
+
+.list-item {
+	height: 50px;
+	background-color: white;
+	border-radius: 8px;
+	border-bottom: 2px solid rgba(0,0,0,.15);
+}
+
+.list-item:hover {
+	cursor: pointer;
+	border-bottom: 1px solid rgba(0,0,0,.15);
+}
+
+.text-red {
+	color: #ff0048;
+}
+
+.text-blue {
+	color: #4e73df;
+}
+
+.text-green {
+	color: #1cc88a;
+}
+
+.data-card.card {
+	border-radius: 7px;
+	box-shadow: 0 8px 16px rgba(0,0,0,.15);
+}
+
+.data-card-icon  {
+	font-size: 30px;
+	transition-duration: 0.5s;
+	color: lightgrey;
+}
+
+#top-data-card {
+	border-left: .25rem solid #ff0048;
+}
+
+#top-data-card:hover #top-data-card-icon {
+	transition-duration: 0.75s;
+	color: #ff0048;
+}
+
+#middle-data-card {
+	border-left: .25rem solid #4e73df;
+}
+
+#middle-data-card:hover #middle-data-card-icon {
+	transition-duration: 0.75s;
+	color: #4e73df;
+}
+
+#bottom-data-card {
+	border-left: .25rem solid #1cc88a;
+}
+
+#bottom-data-card:hover #bottom-data-card-icon {
+	transition-duration: 0.75s;
+	color: #1cc88a;
+}

@@ -1,0 +1,99 @@
+.register-page {
+	overflow: auto;
+	padding: 0;
+	min-height: 100vh;
+	overflow: hidden;
+}
+
+.form-control {
+    height: calc(1.5em + .75rem + 2px);
+}
+
+.register-row {
+	min-height: 100vh;
+	margin: 0;
+}
+
+.register-left {
+	position: sticky;
+    top: 0;
+	height: 100vh;
+	overflow: hidden;
+}
+
+.check-icon {
+	color: red;
+}
+
+.text-sm {
+	font-size: 13px;
+}
+
+.no-decoration:hover {
+	text-decoration: none;
+	color: black;
+}
+
+.register-right {
+	overflow: auto;
+	height: 100vh;
+	padding: 6rem 4.5rem 2rem 5rem;
+	background-color: white;
+	border-left: 1px solid rgb(248, 184, 184);
+}
+
+.register-form-container {
+	max-width: 25rem;
+}
+
+.register-left-blurb {
+	max-width: 17.5rem;
+}
+
+.register-left-footer {
+	width: 100%;
+	position: absolute;
+	bottom: 2.5rem;
+}
+
+.text-darker {
+	font-weight: 500;
+}
+
+.text-dimmer {
+	color: rgb(65, 65, 65);
+}
+
+.blurb-wrapper {
+	min-height: calc(100% - 72px - 72px);
+	float: right;
+	padding-right: 4.5rem;
+	padding-top: 5.45rem;
+}
+
+#nav-right {
+	display: none;
+}
+
+@media (max-width: 992px) {
+	.register-right {
+		padding: 5.5rem 3rem;
+	}
+}
+
+@media (max-width: 768px) {
+	.register-left {
+		display: none;
+	}
+	.register-right {
+		padding: 0 2rem;
+	}
+	.register-form-container {
+		margin: auto;
+		margin-top: 2rem;
+		max-width: 20rem;
+	}
+	#nav-right {
+		display: block;
+	}
+}

@@ -1,0 +1,69 @@
+/*
+ * Base structure
+ */
+
+html,
+body {
+	background-color: rgb(254, 246, 250);
+}
+
+body {
+	display: -ms-flexbox;
+	display: flex;
+	color: rgb(30, 30, 30);
+}
+
+.home-page {
+	height: 100%;
+}
+
+/*
+ * Cover
+ */
+.cover-container {
+	max-width: 42rem;
+	/* the view height - header height (72px) - footer height (60px) - a few px to align veritcal center up more */
+	height: calc(100vh - 72px - 96px);
+}
+
+#cover-heading-top {
+	margin-bottom: 0;
+}
+  
+.cover {
+  	padding: 0 1.5rem;
+}
+
+.cover .btn-lg {
+	padding: .75rem 1.25rem;
+	font-weight: 700;
+}
+
+.btn-danger,
+.btn-danger:not(:disabled):not(.disabled):active:focus,
+.btn-danger:focus {
+	background-color: rgb(255, 0, 0);
+	border: 0;
+	box-shadow: 2px 4px 1px 0px rgba(0, 0, 0, 0.747);
+}
+.btn-danger:hover,
+.btn-danger:not(:disabled):not(.disabled):active:focus,
+.btn-danger:focus {
+	background-color: rgba(255, 0, 0, 0.678);
+	
+}
+
+/*
+ * Media Queries
+ */
+
+@media (max-width: 992px) {
+	.cover {
+		padding: 0 1rem;
+	}
+
+	.cover-container {
+		max-width: 25rem;
+		height: calc(100vh - 72px);
+	}
+}

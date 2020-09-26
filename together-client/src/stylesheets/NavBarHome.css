@@ -1,0 +1,30 @@
+.navbar-brand {
+	font-family: 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+	font-weight: 800;
+	color: rgb(150, 0, 0)!important;
+}
+.white-background {
+	background-color: white;
+}
+
+.navbar-brand:hover {
+	color: rgb(211, 3, 3)!important;
+}
+
+.login-link {
+	color: black!important;
+	font-weight: bolder;
+	border: 2px solid black;
+	border-radius: 4px;
+	padding: 5px;
+}
+
+.navbar-nav .nav-link.login-link {
+    padding: 5px;
+}
+
+.login-link:hover {
+	background-color: rgba(255, 0, 0, 0.678);
+	color: white!important;
+	border-color: transparent;
+}

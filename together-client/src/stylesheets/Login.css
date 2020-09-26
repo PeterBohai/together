@@ -1,0 +1,68 @@
+.login-page {
+	height: 100%;
+}
+
+.text-md {
+	font-size: 15px;
+}
+
+.login-container {
+	max-width: 30rem;
+	/* the view height - header height (72px) - footer height (60px) - a few px to align veritcal center up more */
+	min-height: calc(100vh - 164px);
+}
+
+.login-card {
+	width: 100%;
+	box-shadow: rgba(60, 66, 87, 0.12) 0px 7px 14px 0px, rgba(0, 0, 0, 0.12) 0px 3px 6px 0px;
+}
+
+.login-card-body {
+	padding: 3rem 3rem;
+}
+
+.btn-login {
+	color: #fff;
+    background-color: rgb(190, 0, 0);
+    border-color: rgb(190, 0, 0);
+}
+
+.btn-login:hover {
+	color: #fff;
+    background-color: rgb(215, 3, 3);
+    border-color: rgb(215, 3, 3);
+}
+
+.login-msg {
+	margin-bottom: 2rem;
+}
+
+.form-control {
+  position: relative;
+  box-sizing: border-box;
+  height: auto;
+  padding: 10px;
+  font-size: 16px;
+}
+
+.form-control:focus{
+	box-shadow: 0 0 0 0.15rem rgba(0,123,255,.25);
+}
+
+.error-msg {
+	margin-bottom: 1px;
+}
+
+.login-button{
+	margin-top: 2.5rem;
+}
+
+@media (max-width: 992px) {
+	.login-container {
+		max-width: 23rem;
+		height: calc(100vh - 72px - 36px);
+	}
+	.login-card-body {
+		padding: 2.5rem 2rem;
+	}
+}
