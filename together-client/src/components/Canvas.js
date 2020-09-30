@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import '../stylesheets/Canvas.css';
 
-const Canvas = ({ width, height, color, mode, mouseCoords, handleClear, updateMousePos}) => {
+const Canvas = ({ width, height, color, mode, canvasEvent, handleClear, userInfo, updateMousePos}) => {
 	const canvasRef = useRef(null);
 	const contextRef = useRef(null);
 	const [isDrawing, setIsDrawing] = useState(false);
@@ -41,14 +41,30 @@ const Canvas = ({ width, height, color, mode, mouseCoords, handleClear, updateMo
 		contextRef.current.strokeStyle = color;
 	}, [color]);
 
-	// TODO: Fix draw only when the coords are from the other person (draw start and end needs to be specified as well)
 	useEffect(() => {
-		if (mouseCoords !== null) {
-			console.log('Canvas mouseCoords useEffect', mouseCoords);
-			// const {offsetX, offsetY} = mouseCoords;
-			// draw
+		if (canvasEvent !== null) {
+			// Sync a finished "stroke" instead of sending every single drawing coordinate and event (Reduce load on websocket send queue)
+			const img = new Image();
+			img.src = canvasEvent.status;
+			img.onload = () => {
+				contextRef.current.drawImage(img, 0, 0, width, height);
+			};
+
+			// (Ideally) Sync every drawing coordinate and event for smoother real-time interaction
+
+			// console.log('RECEIVing Canvas Event useEffect', canvasEvent);
+			// if (canvasEvent.status === 'start') {
+			// 	const mouseCoords = {offsetX: canvasEvent.offset_x, offsetY: canvasEvent.offset_y};
+			// 	startDrawing(mouseCoords, canvasEvent.username);
+			// } else if (canvasEvent.status === 'drawing') {
+			// 	const mouseCoords = {offsetX: canvasEvent.offset_x, offsetY: canvasEvent.offset_y};
+			// 	handleDraw(mouseCoords, canvasEvent.username);
+			// } else if (canvasEvent.status === 'stop') {
+			// 	finishDrawing(canvasEvent.username);
+			// }
 		}
-	}, [mouseCoords]);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [canvasEvent]);
 
 	// Clear the drawing when the Clear button is pressed in the Room
 	useEffect(() => {
@@ -60,38 +76,39 @@ const Canvas = ({ width, height, color, mode, mouseCoords, handleClear, updateMo
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [mode]);
 
-	const startDrawing = ({ nativeEvent }) => {
-		const {offsetX, offsetY} = nativeEvent;
+	// ---------------
+	// Draw functions
+	// ---------------
 
+	const startDrawing = (nativeEvent, username) => {
+		const {offsetX, offsetY} = nativeEvent;
+		// if (username === userInfo.username) {
+		// 	updateMousePos({offsetX, offsetY, status: 'start'});
+		// }
 		contextRef.current.beginPath();
 		contextRef.current.moveTo(offsetX, offsetY);
 		setIsDrawing(true);
 	};
 
-	// ---------------
-	// Draw functions
-	// ---------------
-	const finishDrawing = () => {
+	const finishDrawing = (username) => {
 		contextRef.current.closePath();
-
+		if (username === userInfo.username) {
+			updateMousePos({status: canvasRef.current.toDataURL()});
+		}
 		// save drawing to be loaded again when page is refreshed
 		localStorage.setItem('roomCanvas', canvasRef.current.toDataURL());
+		console.log(typeof(canvasRef.current.toDataURL()));
 		setIsDrawing(false);
 	};
 
-	const handleDraw = ({ nativeEvent }) => {
+	const handleDraw = (nativeEvent, username) => {
 		if (!isDrawing) {
 			return;
 		}
 		const {offsetX, offsetY} = nativeEvent;
-		draw(offsetX, offsetY);
-	};
-
-	const draw = (offsetX, offsetY) => {
-		// Send coords up to parent component Room to be processed and delivered to server
-		if (isDrawing) {
-			updateMousePos({offsetX, offsetY});
-		}
+		// if (username === userInfo.username) {
+		// 	updateMousePos({offsetX, offsetY, status: 'drawing'});
+		// }
 		
 		if (mode === 'erase') {
 			contextRef.current.globalCompositeOperation = 'destination-out';
@@ -112,9 +129,9 @@ const Canvas = ({ width, height, color, mode, mouseCoords, handleClear, updateMo
 		<canvas 
 			id="room-canvas"
 			width="800" height="320" 
-			onMouseDown={startDrawing}
-			onMouseUp={finishDrawing}
-			onMouseMove={handleDraw}
+			onMouseDown={({ nativeEvent }) => startDrawing(nativeEvent, userInfo.username)}
+			onMouseUp={() => finishDrawing(userInfo.username)}
+			onMouseMove={({ nativeEvent }) => handleDraw(nativeEvent, userInfo.username)}
 			onMouseLeave={finishDrawing}
 			ref={canvasRef}
 		/>
@@ -126,9 +143,10 @@ Canvas.propTypes = {
 	height: PropTypes.number.isRequired,
 	color: PropTypes.string.isRequired,
 	mode: PropTypes.string.isRequired,
-	mouseCoords: PropTypes.object,
+	canvasEvent: PropTypes.object,
 	handleClear: PropTypes.func.isRequired,
-	updateMousePos: PropTypes.func
+	updateMousePos: PropTypes.func,
+	userInfo: PropTypes.object
 };
 
 export default Canvas;

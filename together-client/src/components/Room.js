@@ -7,7 +7,24 @@ import FooterHome from './FooterHome';
 import '../stylesheets/Room.css';
 
 const Room = (props) => {
-	
+	const [userInfo, setUserInfo] = useState({});
+	// Get User information
+	useEffect(() => {
+		const token = localStorage.getItem('token');
+		console.log(token);
+		axios.get('http://127.0.0.1:8000/rest-auth/user/', {
+			
+			headers: {'Authorization': 'Token ' + token}
+		})
+			.then(res => {
+				console.log('user data', res.data);
+				setUserInfo(res.data);
+			})
+			.catch(err => {
+				console.log('failed getting user data', err.response);
+			});
+	}, []);
+
 	// Initialize and open a websocket connection to the server
 	const ws = useRef(null);
 	useEffect(() => {
@@ -15,6 +32,7 @@ const Room = (props) => {
 		ws.current.onopen = () => {
 			console.log('websocket conneciton opened');
 			ws.current.send(JSON.stringify({'command': 'fetch_messages' }));
+			console.log('bufferedAmount', ws.current.bufferedAmount);
 		};
 		ws.current.onclose = () => console.log('websocket conneciton closed');
 
@@ -22,17 +40,19 @@ const Room = (props) => {
 		return () => {
 			ws.current.close();
 		};
-	}, []);
+	}, [props.isAuthenticated]);
+
+	
 
 	// Handle receiving websocket messages from the server
 	const [allLists, setAllLists] = useState([]);
-	const [mouseCoords, setMouseCoords] = useState(null);
+	const [canvasServerEvent, setCanvasServerEvent] = useState(null);
 	useEffect(() => {
 		if (!ws.current) return;
 
 		ws.current.onmessage = e => {
 			const data = JSON.parse(e.data);
-			console.log('onmessage data:', data);
+			// console.log('onmessage data:', data);
 
 			if (data.command === 'new_message'){
 				setAllLists([...allLists, data.message.content]);
@@ -43,12 +63,13 @@ const Room = (props) => {
 				setAllLists(recievedList);
 				console.log('messages recieved', recievedList);
 
-			} else if(data.command === 'new_canvas_coords') {
-				setMouseCoords({offsetX: data.offset_x, offsetY: data.offset_y});
-				console.log('new_canvas_coords recieved', mouseCoords);
+			} else if(data.command === 'new_canvas_coords' && data.username !== userInfo.username) {
+				setCanvasServerEvent(data);
+				console.log('new_canvas_coords RECEIVED', canvasServerEvent);
 			}
 		};
-	}, [allLists, mouseCoords]);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [allLists, canvasServerEvent]);
 
 	// Get updated value of window width when resizing or on different screen sizes
 	const [windowWidth, setWindowWidth] = useState(window.innerWidth);
@@ -87,6 +108,7 @@ const Room = (props) => {
 	const [textInput, setTextInput] = useState('');
 	const handleSubmit = (event) => {
 		event.preventDefault();
+		
 		ws.current.send(JSON.stringify({
 			'command': 'new_message',
 			'message': textInput,
@@ -99,12 +121,14 @@ const Room = (props) => {
 	// Recieve mouse coords from the Canvas component when drawing (send data to server for braodcasting)
 	const updateMousePos = (mouseEvent) => {
 		if(ws.current.readyState === WebSocket.OPEN) {
-			console.log('MouseEvent from Canvas', mouseEvent);
+			console.log('SENDing MouseEvent from Canvas', mouseEvent);
 			ws.current.send(JSON.stringify({
-				'command': 'new_canvas_coords',
-				'offset_x': mouseEvent.offsetX,
-				'offset_y': mouseEvent.offsetY
-			}));
+				command: 'new_canvas_coords',
+				username: userInfo.username,
+				offset_x: mouseEvent.offsetX,
+				offset_y: mouseEvent.offsetY,
+				status: mouseEvent.status
+			}));	
 		}
 	};
 
@@ -119,7 +143,9 @@ const Room = (props) => {
 	return (
 		<div id="room-page">
 			<NavBarHome {...props} />
-
+			<div className="text-center w-100 mt-3">
+				Current user: <strong>{userInfo.username}</strong>
+			</div>
 			<div className="upper-container row mt-4" style={{margin: '0'}}>
 				<div className="col-lg-9 canvas-card-wrapper p-5">
 					<div className="card shadow mb-4">
@@ -157,9 +183,10 @@ const Room = (props) => {
 								width={1000} height={330} 
 								color={strokeColor} 
 								mode={strokeMode} 
-								mouseCoords={mouseCoords}
+								canvasEvent={canvasServerEvent}
 								handleClear={changeModeToDraw} 
-								updateMousePos={updateMousePos} 
+								updateMousePos={updateMousePos}
+								userInfo={userInfo}
 							/>
 						</div>
 					</div>

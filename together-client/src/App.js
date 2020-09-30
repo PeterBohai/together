@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { BrowserRouter as Router, Route, Switch} from 'react-router-dom';
+import { BrowserRouter as Router, Switch} from 'react-router-dom';
 import { connect } from 'react-redux';
 import * as actions from './store/actions/auth';
 import { library } from '@fortawesome/fontawesome-svg-core';
@@ -7,6 +7,8 @@ import { fas } from '@fortawesome/free-solid-svg-icons';
 import { fab } from '@fortawesome/free-brands-svg-icons';
 import PropTypes from 'prop-types';
 
+import PrivateRoute from './components/PrivateRoute';
+import PublicRoute from './components/PublicRoute';
 import Home from './components/Home';
 import Login from './components/Login';
 import Register from './components/Register';
@@ -23,22 +25,16 @@ const App = (props) => {
 		props.onTryAutoSignup();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
+	console.log('isAuthenticated', props.isAuthenticated);
 
 	return (
 		<Router>
 			<Switch>
-				<Route exact path="/register" >
-					<Register {...props} />
-				</Route>
-				<Route exact path="/login" >
-					<Login {...props}/>
-				</Route>
-				<Route exact path="/room" >
-					<Room {...props}/>
-				</Route>
-				<Route exact path="/" >
-					<Home {...props}/>
-				</Route>
+				<PublicRoute exact path="/login" {...props} comp={Login} ></PublicRoute>
+				<PublicRoute exact path="/register" {...props} comp={Register} ></PublicRoute>
+				<PrivateRoute path="/room" {...props} comp={Room} >
+				</PrivateRoute>
+				<PublicRoute exact path="/" {...props} comp={Home} ></PublicRoute>
 			</Switch>
 		</Router>
 	);

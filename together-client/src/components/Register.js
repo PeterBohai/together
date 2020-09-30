@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useHistory }  from 'react-router-dom';
+import { Link, useHistory, useLocation }  from 'react-router-dom';
 import { connect } from 'react-redux';
 import * as actions from '../store/actions/auth';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -18,6 +18,7 @@ const Register = (props) => {
 	const [password2, setPassword2] = useState('');
 	const [errorMessages, setErrorMessages] = useState([]);
 	const history = useHistory();
+	const location = useLocation();
 
 	useEffect(() => {
 		function handleResize() {
@@ -32,6 +33,10 @@ const Register = (props) => {
 		// only redirect to the rooom view if there is no error, otherwise display error messages with alerts
 		props.onAuth(firstName, lastName, username, email, password1, password2)
 			.then(res => {
+				// replace the current path with the previous page since going back to the Login page after authentication doesn't make sense
+				const { from } = location.state || { from: { pathname: '/' } };
+				history.replace(from);
+				// redirect to the user's room
 				history.push('/room');
 			})
 			.catch(err => {

@@ -27,13 +27,7 @@ class RoomConsumer(WebsocketConsumer):
         return self.send_one_message(content)
 
     def new_canvas_coords(self, data):
-        offset_x, offset_y = data['offset_x'], data['offset_y']
-        content = {
-            'command': 'new_canvas_coords',
-            'offset_x': offset_x,
-            'offset_y': offset_y
-        }
-        return self.send_canvas_coords(content)
+        return self.send_canvas_coords(data)
 
     def messages_to_json(self, messages):
         result = []
@@ -70,7 +64,11 @@ class RoomConsumer(WebsocketConsumer):
             self.channel_name
         )
 
+    # ---------------------------------------------------------------
+    # Receive from WebSocket and send to other servers in the same group
+    # ----------------------------------------------------------------
     def receive(self, text_data):
+        print('TEXT DATA', text_data)
         data = json.loads(text_data)
         self.commands[data['command']](self, data)
 
@@ -92,6 +90,9 @@ class RoomConsumer(WebsocketConsumer):
             }
         )
 
+    # ---------------------------------------------
+    # Receive from room group and send to WebSocket
+    # ---------------------------------------------
     def send_messages(self, message):
         self.send(text_data=json.dumps(message))
 

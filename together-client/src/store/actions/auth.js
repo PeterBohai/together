@@ -22,7 +22,7 @@ export const authFail = (error) => {
 };
 
 export const logout = () => {
-	localStorage.removeItem('user');
+	localStorage.removeItem('token');
 	localStorage.removeItem('expirationDate');
 	return {
 		type: actionTypes.AUTH_LOGOUT
@@ -49,6 +49,7 @@ export const authSignup = (firstName, lastName, username, email, password1, pass
 			password2
 		})
 			.then(res => {
+			
 				const token = res.data.key;
 
 				// 1hr long expiration date
@@ -76,6 +77,7 @@ export const authLogin = (username, password) => {
 			password
 		})
 			.then(res => {
+				console.log('authLogin res data', res.data);
 				const token = res.data.key;
 
 				// 1hr long expiration date
