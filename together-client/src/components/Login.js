@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState , useEffect } from 'react';
 import { Link, useHistory, useLocation } from 'react-router-dom';
 import { connect } from 'react-redux';
 import * as actions from '../store/actions/auth';
@@ -14,15 +14,19 @@ const Login = (props) => {
 	const [errorMessages, setErrorMessages] = useState([]);
 	const history = useHistory();
 	const location = useLocation();
+
+	useEffect(() => {
+		if (props.isAuthenticated) {
+			history.push('/room');
+		}
+	}, []);
 	
 	const handleLogin = (event) => {
 		event.preventDefault();
 		props.onAuth(username, password)
 			.then(res => {
 				// replace the current path with the previous page since going back to the Login page after authentication doesn't make sense
-				const { from } = location.state || { from: { pathname: '/' } };
-				history.replace(from);
-				// redirect to the user's room
+				console.log(res);
 				history.push('/room');
 			})
 			.catch(err => {
@@ -33,7 +37,9 @@ const Login = (props) => {
 				setErrorMessages(errors);
 			});
 	};
-
+	if (props.isAuthenticated) {
+		return(<div></div>);
+	}
 	return (
 		<div className="login-page text-center">
 			<NavBarHome />
@@ -91,7 +97,8 @@ const Login = (props) => {
 
 Login.propTypes = {
 	onAuth: PropTypes.func.isRequired,
-	error: PropTypes.object
+	error: PropTypes.object,
+	isAuthenticated: PropTypes.bool.isRequired
 };
 
 const mapStateToProps = (state) => {

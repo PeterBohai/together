@@ -1,51 +1,54 @@
 import React, { useState, useEffect, useRef } from 'react';
+import PropTypes from 'prop-types';
 import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import NavBarHome from './NavBarHome';
-import Canvas from './Canvas';
+import Canvas from './app-components/CanvasApp';
+import ListApp from './app-components/ListApp';
 import FooterHome from './FooterHome';
 import '../stylesheets/Room.css';
 
 const Room = (props) => {
 	const [userInfo, setUserInfo] = useState({});
+	
+	// ---------------------------------------------
+	// Effect Hooks
+	// ---------------------------------------------
+
 	// Get User information
 	useEffect(() => {
-		const token = localStorage.getItem('token');
-		console.log(token);
-		axios.get('http://127.0.0.1:8000/rest-auth/user/', {
-			
-			headers: {'Authorization': 'Token ' + token}
-		})
-			.then(res => {
-				console.log('user data', res.data);
-				setUserInfo(res.data);
-			})
-			.catch(err => {
-				console.log('failed getting user data', err.response);
-			});
+		const user = localStorage.getItem('user');	
+		setUserInfo(JSON.parse(user));
+		console.log('User data from localStorage', user);
 	}, []);
 
 	// Initialize and open a websocket connection to the server
 	const ws = useRef(null);
+	const [wsRefReady, setWsRefReady] = useState(false);
 	useEffect(() => {
-		ws.current = new WebSocket('ws://127.0.0.1:8000/ws/room/');
+		ws.current = new WebSocket('ws://127.0.0.1:8000/ws/room/testing/');
 		ws.current.onopen = () => {
 			console.log('websocket conneciton opened');
-			ws.current.send(JSON.stringify({'command': 'fetch_messages' }));
-			console.log('bufferedAmount', ws.current.bufferedAmount);
+			const data = {
+				command: 'fetch_lists', 
+				username: userInfo.username || JSON.parse(localStorage.getItem('user')).username
+			};
+			console.log('fetching lists with:', data);
+			ws.current.send(JSON.stringify(data));
 		};
 		ws.current.onclose = () => console.log('websocket conneciton closed');
-
 		// Close the websocket connection when the component unmounts
 		return () => {
 			ws.current.close();
 		};
 	}, [props.isAuthenticated]);
 
-	
+	useEffect(() => {
+		setWsRefReady(true);
+	}, []);
 
 	// Handle receiving websocket messages from the server
-	const [allLists, setAllLists] = useState([]);
+	const [roomLists, setRoomLists] = useState([]);
 	const [canvasServerEvent, setCanvasServerEvent] = useState(null);
 	useEffect(() => {
 		if (!ws.current) return;
@@ -55,13 +58,8 @@ const Room = (props) => {
 			// console.log('onmessage data:', data);
 
 			if (data.command === 'new_message'){
-				setAllLists([...allLists, data.message.content]);
+				setRoomLists([...roomLists, data.message.content]);
 				console.log('new_message recieved', data.message.content);
-
-			} else if(data.command === 'messages') {
-				const recievedList = data.messages.map(messageObj => messageObj.content);
-				setAllLists(recievedList);
-				console.log('messages recieved', recievedList);
 
 			} else if(data.command === 'new_canvas_coords' && data.username !== userInfo.username) {
 				setCanvasServerEvent(data);
@@ -69,7 +67,7 @@ const Room = (props) => {
 			}
 		};
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [allLists, canvasServerEvent]);
+	}, [roomLists, canvasServerEvent]);
 
 	// Get updated value of window width when resizing or on different screen sizes
 	const [windowWidth, setWindowWidth] = useState(window.innerWidth);
@@ -84,14 +82,22 @@ const Room = (props) => {
 	// Get a random daily tip from the server
 	const [dailyTip, setDailyTip] = useState({});
 	useEffect(() => {
+		let isMounted = true;
 		axios.get('http://127.0.0.1:8000/api/2')
 			.then(res => {
-				setDailyTip(res.data);
+				if (isMounted){
+					setDailyTip(res.data);
+				}
 			})
 			.catch(err => {
 				console.log(`Error getting daily tip: ${err.response}`);
 			});
+		return () => isMounted = false;
 	}, []);
+
+	// ---------------------------------------------
+	// Handler Functions
+	// ---------------------------------------------
 
 	// Set the Canvas properties and pass the values to the Canvas component
 	const [strokeColor, setStrokeColor] = useState('black');
@@ -102,20 +108,6 @@ const Room = (props) => {
 	const changeStrokeColor = (color) => {
 		setStrokeColor(color);
 		setStrokeMode('draw');
-	};
-
-	// Form submit function for the lists
-	const [textInput, setTextInput] = useState('');
-	const handleSubmit = (event) => {
-		event.preventDefault();
-		
-		ws.current.send(JSON.stringify({
-			'command': 'new_message',
-			'message': textInput,
-			'from': 'Pete'
-		}));
-		console.log('allLists', allLists);
-		setTextInput('');
 	};
 
 	// Recieve mouse coords from the Canvas component when drawing (send data to server for braodcasting)
@@ -139,6 +131,9 @@ const Room = (props) => {
 	} else {
 		statCardContainerClasses += ' pl-0 pr-5 pb-5 pt-5';
 	}
+	// ---------------------------------------------
+	// Render
+	// ---------------------------------------------
 
 	return (
 		<div id="room-page">
@@ -245,18 +240,7 @@ const Room = (props) => {
 			
 			<div className="lower-container row" style={{margin: '0'}}>
 				<div className="col-lg-6 pr-5 pl-5">
-					<div className="card shadow mb-4" style={{minHeight: '500px'}}>
-						<div className="card-header py-2" style={{backgroundColor: '#4e73df'}}>
-							<h6 className="m-0 font-weight-bold" style={{color: 'white'}}>Your Lists</h6>
-						</div>
-                
-						<div className="card-body" style={{backgroundColor: '#ecf4ff'}}>
-							<div className="list-item p-3 mb-3 d-flex align-items-center" >Shopping</div>
-							<div className="list-item p-3 mb-3 d-flex align-items-center" >ToDo</div>
-							<div className="list-item p-3 mb-3 d-flex align-items-center" >Important Reminders!</div>
-							<div className="list-item p-3 mb-3 d-flex align-items-center">Date Spot Ideas <span role="img" aria-label="heart emoji">❤️</span></div>
-						</div>
-					</div>
+					{wsRefReady ? <ListApp {...props} ref={ws} userInfo={userInfo}/> : null}
 				</div>
 
 				<div className="col-lg-6 pr-5 pl-5 mb-5">
@@ -294,5 +278,10 @@ const Room = (props) => {
 		</div>
 	);
 };
+
+Room.propTypes = {
+	isAuthenticated: PropTypes.bool
+};
+
 
 export default Room;

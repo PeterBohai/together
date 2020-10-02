@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { BrowserRouter as Router, Switch} from 'react-router-dom';
+import { BrowserRouter as Router, Route, Switch} from 'react-router-dom';
 import { connect } from 'react-redux';
 import * as actions from './store/actions/auth';
 import { library } from '@fortawesome/fontawesome-svg-core';
@@ -25,13 +25,18 @@ const App = (props) => {
 		props.onTryAutoSignup();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
-	console.log('isAuthenticated', props.isAuthenticated);
 
 	return (
 		<Router>
 			<Switch>
-				<PublicRoute exact path="/login" {...props} comp={Login} ></PublicRoute>
-				<PublicRoute exact path="/register" {...props} comp={Register} ></PublicRoute>
+				<Route exact path="/login">
+					<Login {...props}/>
+				</Route>
+				{/* <PublicRoute exact path="/login" {...props} comp={Login} ></PublicRoute> */}
+				{/* <PublicRoute exact path="/register" {...props} comp={Register} ></PublicRoute> */}
+				<Route exact path="/register">
+					<Register {...props}/>
+				</Route>
 				<PrivateRoute path="/room" {...props} comp={Room} >
 				</PrivateRoute>
 				<PublicRoute exact path="/" {...props} comp={Home} ></PublicRoute>

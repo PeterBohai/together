@@ -23,6 +23,7 @@ export const authFail = (error) => {
 
 export const logout = () => {
 	localStorage.removeItem('token');
+	localStorage.removeItem('user');
 	localStorage.removeItem('expirationDate');
 	return {
 		type: actionTypes.AUTH_LOGOUT
@@ -53,12 +54,24 @@ export const authSignup = (firstName, lastName, username, email, password1, pass
 				const token = res.data.key;
 
 				// 1hr long expiration date
-				const expirationDate = new Date(new Date().getTime() + 3600 * 1000);
+				const expirationDate = new Date(new Date().getTime() + 24 * 3600 * 1000);
 				localStorage.setItem('token', token);
 				localStorage.setItem('expirationDate', expirationDate);
 				dispatch(authSuccess(token));
 				dispatch(checkAuthTimeout(3600));  // 3600 seconds
-				return {success: true};
+				
+				// Store basic user info in localstorage as well
+				return axios.get('http://127.0.0.1:8000/rest-auth/user/', {
+					headers: {'Authorization': 'Token ' + token}
+				})
+					.then(res => {
+						localStorage.setItem('user', JSON.stringify(res.data));
+						console.log('user data', res.data);
+						return {success: true};
+					})
+					.catch(err => {
+						console.log('failed getting user data', err.response);
+					});
 			})
 			.catch(err => {
 				// errors messages will be in the err response data returned
@@ -77,16 +90,26 @@ export const authLogin = (username, password) => {
 			password
 		})
 			.then(res => {
-				console.log('authLogin res data', res.data);
 				const token = res.data.key;
 
 				// 1hr long expiration date
-				const expirationDate = new Date(new Date().getTime() + 3600 * 1000);
+				const expirationDate = new Date(new Date().getTime() + 24 * 3600 * 1000);
 				localStorage.setItem('token', token);
 				localStorage.setItem('expirationDate', expirationDate);
 				dispatch(authSuccess(token));
 				dispatch(checkAuthTimeout(3600));  // 3600 seconds
-				return {success: true};
+				
+				// Store basic user info in localstorage as well
+				return axios.get('http://127.0.0.1:8000/rest-auth/user/', {
+					headers: {'Authorization': 'Token ' + token}
+				})
+					.then(res => {
+						localStorage.setItem('user', JSON.stringify(res.data));
+						return {success: true};
+					})
+					.catch(err => {
+						console.log('failed getting user data', err.response);
+					});
 			})
 			.catch(err => {
 				// errors messages will be in the err response data returned

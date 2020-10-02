@@ -3,7 +3,6 @@ import { Route, Redirect} from 'react-router-dom';
 import PropTypes from 'prop-types';
 
 const PrivateRoute = ({ comp: Component, ...rest}) => {
-	console.log('isAuthenticated', rest.isAuthenticated);
 	const isLoggedIn = rest.isAuthenticated;
 	return (
 		<Route

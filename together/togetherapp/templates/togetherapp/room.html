@@ -157,7 +157,7 @@
     };
 
     function fetchMessages() {
-      chatSocket.send(JSON.stringify({'command': 'fetch_messages' }));
+      chatSocket.send(JSON.stringify({'command': 'fetch_lists' }));
     }
 
     function createMessage(data) {

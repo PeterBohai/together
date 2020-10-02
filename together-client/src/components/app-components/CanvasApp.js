@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
-import '../stylesheets/Canvas.css';
+import '../../stylesheets/CanvasApp.css';
 
 const Canvas = ({ width, height, color, mode, canvasEvent, handleClear, userInfo, updateMousePos}) => {
 	const canvasRef = useRef(null);
@@ -44,6 +44,7 @@ const Canvas = ({ width, height, color, mode, canvasEvent, handleClear, userInfo
 	useEffect(() => {
 		if (canvasEvent !== null) {
 			// Sync a finished "stroke" instead of sending every single drawing coordinate and event (Reduce load on websocket send queue)
+			// DataUrl is a string
 			const img = new Image();
 			img.src = canvasEvent.status;
 			img.onload = () => {
@@ -97,7 +98,6 @@ const Canvas = ({ width, height, color, mode, canvasEvent, handleClear, userInfo
 		}
 		// save drawing to be loaded again when page is refreshed
 		localStorage.setItem('roomCanvas', canvasRef.current.toDataURL());
-		console.log(typeof(canvasRef.current.toDataURL()));
 		setIsDrawing(false);
 	};
 

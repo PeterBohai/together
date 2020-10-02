@@ -21,6 +21,12 @@ const Register = (props) => {
 	const location = useLocation();
 
 	useEffect(() => {
+		if (props.isAuthenticated) {
+			history.push('/room');
+		}
+	}, []);
+
+	useEffect(() => {
 		function handleResize() {
 			setWindowWidth(window.innerWidth);
 		}
@@ -47,6 +53,10 @@ const Register = (props) => {
 				setErrorMessages(errors);
 			});
 	};
+
+	if (props.isAuthenticated) {
+		return(<div></div>);
+	}
 
 	return (
 		<div className="register-page">
@@ -175,7 +185,8 @@ const Register = (props) => {
 };
 
 Register.propTypes = {
-	onAuth: PropTypes.func.isRequired
+	onAuth: PropTypes.func.isRequired,
+	isAuthenticated: PropTypes.bool.isRequired
 };
 
 const mapStateToProps = (state) => {
