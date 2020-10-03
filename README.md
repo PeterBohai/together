@@ -12,7 +12,8 @@ Together is a website focused on giving couples a "virtual room" or space to int
 Inside each room, couples will have the ability to draw on a shared canvas. A space to create and share lists (To-do, shopping, etc.) will also be avialable and updated in real-time. And finally, a fun quiz application that tests couples on vaious topics is included as well. These questions help spark interesting conversations and give more insight into the relationship. Couples will not only answer their own questions, but they will also try to guess the other's answers. Points will be awarded accordingly. Of course, a couples app is not complete with various interesting stats about the relationship. Hence, these stats, such as the number of days together, will be elegantly displayed beside the above features.
 
 ### Short Demos of Main Features (In Development)
-<img src="https://media.giphy.com/media/bUYoRaFykP2OzuSmSU/giphy.gif" width=48%/>
+Note the quality may be low due to conversion from video to GIF format. <br/>
+<img src="https://media.giphy.com/media/bUYoRaFykP2OzuSmSU/giphy.gif" width=65%/>
 
 
 ### Screenshots
