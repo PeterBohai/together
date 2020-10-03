@@ -25,11 +25,25 @@ const ListApp = forwardRef((props, ref) => {
 				console.log('fetched_list_items', data.items);
 				setCurrentListItems(data.items);
 
-			} else if (data.command === 'new_list' || data.command === 'removed_list') {
-				console.log('new_list or removed_list');
+			} else if (data.command === 'new_list') {
+				console.log('new_list', data.list);
 				console.log('fetching lists after overall list changes');
-				if (data.command === 'new_list' && data.username === props.userInfo.username) {
+				if (data.username === props.userInfo.username) {
 					setCurrentList(data.list);
+				}
+				ws.current.send(JSON.stringify({
+					command: 'fetch_lists', 
+					username: props.userInfo.username || JSON.parse(localStorage.getItem('user')).username
+				}));
+
+			} else if (data.command === 'removed_list') {
+				console.log('removed_list');
+				console.log('fetching lists after overall list changes');
+
+				// Give a notification to the other user if he/she is inside the list that was removed, 
+				// and return the display to the all lists view
+				if (data.username !== props.userInfo.username && currentList !== null && insideList && currentList.id === data.list_id) {
+					handleBackToLists();
 				}
 				ws.current.send(JSON.stringify({
 					command: 'fetch_lists', 
@@ -94,6 +108,7 @@ const ListApp = forwardRef((props, ref) => {
 	};
 
 	const handleBackToLists = () => {
+		handleExitAddItemForm();
 		setCurrentList(null);
 		setCurrentListItems([]);
 		setInisdeList(false);
@@ -116,15 +131,47 @@ const ListApp = forwardRef((props, ref) => {
 		}));
 	};
 
+	const handleAddItemButtonClick = () => {
+		setDisplayItemForm(true);
+
+		// exit out of edit mode of an item
+		if (currentItemEditID !== '') {
+			handleExitEditItemForm(currentItemEditID);
+		}
+	};
+
+	const handleExitAddItemForm = () => {
+		setDisplayItemForm(false);
+		setNewItemInput('');
+	};
+
+	const handleExitEditItemForm = itemID => {
+		setCurrentItemContent('');
+		$('#item-edit-form-' + itemID).hide();
+		$('#item-content-' + itemID).show();
+		setCurrentItemEditID('');
+	};
+
+	const handleAddItemFormKeyDown = e => {
+		// exit out of the add item form if inside the input
+		if (e.key === 'Escape') {
+			handleExitAddItemForm();
+		}
+	};
+ 
+	const handleEditItemFormKeyDown = (e, itemID) => {
+		if (e.key === 'Escape') {
+			handleExitEditItemForm(itemID);
+		}
+	};
+
 	const [currentItemContent, setCurrentItemContent] = useState('');
 	const [currentItemEditID, setCurrentItemEditID] = useState('');
 	const handleEditItem = (itemID, itemContent) => {
 		if (currentItemEditID !== '') {
-			setCurrentItemContent('');
-			setCurrentItemEditID('');
-			$('#item-edit-form-' + currentItemEditID).hide();
-			$('#item-content-' + currentItemEditID).show();
+			handleExitEditItemForm(currentItemEditID);
 		}
+		handleExitAddItemForm();
 		setCurrentItemContent(itemContent);
 		setCurrentItemEditID(itemID);
 		$('#item-content-' + itemID).hide();
@@ -142,11 +189,7 @@ const ListApp = forwardRef((props, ref) => {
 			}));
 			$('#item-content-' + itemID).text(currentItemContent);
 		}
-		
-		setCurrentItemContent('');
-		setCurrentItemEditID('');
-		$('#item-edit-form-' + itemID).hide();
-		$('#item-content-' + itemID).show();
+		handleExitEditItemForm(itemID);
 	};
 
 	const handleChecked = (itemID) => {
@@ -214,7 +257,13 @@ const ListApp = forwardRef((props, ref) => {
 							<form onSubmit={event => handleEditItemSubmit(event, item.id, item.content)} className='normally-display-none item-form m-0' id={'item-edit-form-' + item.id}>
 								<div className="item-form-group d-flex align-items-center m-0">
 									<label htmlFor={'item-content-input-' + item.id} className="col-form-label" aria-label="List Name" style={{display: 'none'}}></label>
-									<input ref={input => input && input.focus()} type="text" className="edit-input form-control" id={'item-content-input-' + item.id} value={currentItemContent} onChange={({ target }) => setCurrentItemContent(target.value)}/>
+									<input type="text"
+										ref={input => input && input.focus()} 
+										className="edit-input form-control" 
+										id={'item-content-input-' + item.id} 
+										value={currentItemContent}
+										onKeyDown={e => handleEditItemFormKeyDown(e, item.id)}
+										onChange={({ target }) => setCurrentItemContent(target.value)}/>
 									<button type="submit" className="edit-item-submit ml-2">Save</button>
 								</div>
 								
@@ -248,10 +297,17 @@ const ListApp = forwardRef((props, ref) => {
 					<form onSubmit={handleNewItemSubmit}>
 						<div className="form-group">
 							<label htmlFor="item-content" className="col-form-label" aria-label="List Name" style={{display: 'none'}}></label>
-							<input type="text" className="form-control" id="item-content" placeholder="Add an item" value={newItemInput} onChange={({ target }) => setNewItemInput(target.value)}/>
+							<input type="text" 
+								ref={input => input && input.focus()}
+								className="form-control" id="item-content" 
+								placeholder="Add an item" 
+								value={newItemInput} 
+								onChange={({ target }) => setNewItemInput(target.value)}
+								onKeyDown={handleAddItemFormKeyDown}
+							/>
 						</div>
 						<div style={{float: 'right'}}>
-							<button type="button" className="btn list-app-btn-grey mr-2" onClick={() => setDisplayItemForm(false)}>Cancel</button>
+							<button type="button" className="btn list-app-btn-grey mr-2" onClick={handleExitAddItemForm}>Cancel</button>
 							<button type="submit" className="btn new-list-item-btn">Save</button>
 						</div>
 					</form>
@@ -291,7 +347,7 @@ const ListApp = forwardRef((props, ref) => {
 					&#8592; All Lists
 				</div>
 			</div>
-			<div className="new-list-item-btn btn mr-3" onClick={() => setDisplayItemForm(true)} role='button'>
+			<div className="new-list-item-btn btn mr-3" onClick={handleAddItemButtonClick} role='button'>
 				<div className="justify-content-center h-100 d-flex align-items-center">
 					<FontAwesomeIcon icon={['fas', 'plus']}/>
 				</div>

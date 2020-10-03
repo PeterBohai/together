@@ -40,7 +40,11 @@ class RoomConsumer(WebsocketConsumer):
     def remove_list(self, data):
         list_id = data['list_id']
         List.objects.filter(pk=list_id).delete()
-        return self.send_delete_list({'command': 'removed_list'})
+        content = {
+            'command': 'removed_list',
+            'list_id': list_id
+        }
+        return self.send_delete_list(content)
 
     def remove_list_item(self, data):
         item_id = data['item_id']
