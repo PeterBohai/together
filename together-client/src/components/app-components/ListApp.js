@@ -14,8 +14,9 @@ const ListApp = forwardRef((props, ref) => {
 	useEffect(() => {
 		if (!ws.current) return;
 
-		ws.current.onmessage = e => {
-			const data = JSON.parse(e.data);
+		ws.current.addEventListener('message', event => {
+			const data = JSON.parse(event.data);
+			console.log('onmessage data in ListApp:', data);
 
 			if (data.command === 'fetched_lists') {
 				console.log('fetched_lists', data.lists);
@@ -27,9 +28,10 @@ const ListApp = forwardRef((props, ref) => {
 
 			} else if (data.command === 'new_list') {
 				console.log('new_list', data.list);
-				console.log('fetching lists after overall list changes');
 				if (data.username === props.userInfo.username) {
+					// Enter the list immediately after creating it if this is the creator
 					setCurrentList(data.list);
+					setInisdeList(true);
 				}
 				ws.current.send(JSON.stringify({
 					command: 'fetch_lists', 
@@ -37,12 +39,10 @@ const ListApp = forwardRef((props, ref) => {
 				}));
 
 			} else if (data.command === 'removed_list') {
-				console.log('removed_list');
-				console.log('fetching lists after overall list changes');
+				console.log('removed_list', data.list_id);
 
-				// Give a notification to the other user if he/she is inside the list that was removed, 
-				// and return the display to the all lists view
-				if (data.username !== props.userInfo.username && currentList !== null && insideList && currentList.id === data.list_id) {
+				// Kick the user out of the list being removed if he/she is currently inside that list view
+				if (currentList !== null && insideList && currentList.id === data.list_id) {
 					handleBackToLists();
 				}
 				ws.current.send(JSON.stringify({
@@ -52,6 +52,7 @@ const ListApp = forwardRef((props, ref) => {
 
 			} else if (data.command === 'new_list_item_added') {
 				console.log('new_list_item_added', data.item);
+				
 				if (currentList !== null && insideList && currentList.id === data.item.list_id) {
 					ws.current.send(JSON.stringify({
 						command: 'get_list_items',
@@ -62,7 +63,7 @@ const ListApp = forwardRef((props, ref) => {
 			} else if (data.command === 'removed_list_item') {
 				console.log('removed_list_item');
 				
-				// remove only if different user and current list is the same as the removed item's list
+				// remove from the client's instance only if in the list view and the current list is the same as the removed item's list
 				if (currentList !== null && insideList && currentList.id === data.list_id) {
 					setCurrentListItems(currentListItems.filter(item => item.id !== data.item_id));
 				}
@@ -85,14 +86,13 @@ const ListApp = forwardRef((props, ref) => {
 			else {
 				console.log('data.command invalid or not set');
 			}
-		};
+		});
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [roomLists, currentListItems]);
+	}, []);
 	
 	// ---------------------------------------------
 	// Handler Functions
 	// ---------------------------------------------
-
 	const handleListDetailsClick = (e, list) => {
 		if(e.target.id === ('list-button-' + list.id)) {
 			e.preventDefault();
@@ -132,7 +132,7 @@ const ListApp = forwardRef((props, ref) => {
 	};
 
 	const handleAddItemButtonClick = () => {
-		setDisplayItemForm(true);
+		setdisplayAddItemForm(true);
 
 		// exit out of edit mode of an item
 		if (currentItemEditID !== '') {
@@ -141,7 +141,7 @@ const ListApp = forwardRef((props, ref) => {
 	};
 
 	const handleExitAddItemForm = () => {
-		setDisplayItemForm(false);
+		setdisplayAddItemForm(false);
 		setNewItemInput('');
 	};
 
@@ -205,14 +205,13 @@ const ListApp = forwardRef((props, ref) => {
 	const [listTitleInput, setListTitleInput] = useState('');
 	const handleListTitleSubmit = (event) => {
 		event.preventDefault();
+		
 		ws.current.send(JSON.stringify({
 			'command': 'new_list',
 			'title': listTitleInput,
 			'username': props.userInfo.username || JSON.parse(localStorage.getItem('user')).username
 		}));
 		console.log('New List called', listTitleInput);
-		setCurrentList({title: listTitleInput});
-		setInisdeList(true);
 		setListTitleInput('');
 
 		// Dismiss the modal after submitting
@@ -228,17 +227,15 @@ const ListApp = forwardRef((props, ref) => {
 			'content': newItemInput,
 			'list_id': currentList.id
 		}));
-		console.log('New List Item', newItemInput);
 		setNewItemInput('');
 	};
 
-	const [displayItemForm, setDisplayItemForm] = useState(false);
-	const listAppCardBodyClasses = 'card-body list-app-card-body' + (displayItemForm ? ' pad-bot' : '');
+	const [displayAddItemForm, setdisplayAddItemForm] = useState(false);
+	const listAppCardBodyClasses = 'card-body list-app-card-body' + (displayAddItemForm ? ' pad-bot' : '');
 
 	// ---------------------------------------------
 	// Sub Components
 	// ---------------------------------------------
-
 	const insideListView = (
 		<div className={listAppCardBodyClasses} style={{backgroundColor: '#ffffff'}} >
 			<h4 className="text-center mb-3">{currentList !== null ? currentList.title : null}</h4>
@@ -258,6 +255,7 @@ const ListApp = forwardRef((props, ref) => {
 								<div className="item-form-group d-flex align-items-center m-0">
 									<label htmlFor={'item-content-input-' + item.id} className="col-form-label" aria-label="List Name" style={{display: 'none'}}></label>
 									<input type="text"
+										required
 										ref={input => input && input.focus()} 
 										className="edit-input form-control" 
 										id={'item-content-input-' + item.id} 
@@ -291,13 +289,14 @@ const ListApp = forwardRef((props, ref) => {
 				</div>
 			)}
 
-			{displayItemForm
+			{displayAddItemForm
 				? 
 				<div className="create-item-form px-4">
 					<form onSubmit={handleNewItemSubmit}>
 						<div className="form-group">
 							<label htmlFor="item-content" className="col-form-label" aria-label="List Name" style={{display: 'none'}}></label>
 							<input type="text" 
+								required
 								ref={input => input && input.focus()}
 								className="form-control" id="item-content" 
 								placeholder="Add an item" 
@@ -331,7 +330,10 @@ const ListApp = forwardRef((props, ref) => {
 						>
 							{list.title}
 						</div>
-						<button id={'list-button-' + list.id} className="normally-display-none btn canvas-btn" name="removeButton" onClick={() => handleRemoveList(list.id)}>
+						<button id={'list-button-' + list.id} 
+							className="normally-display-none btn canvas-btn" 
+							name="removeButton" 
+							onClick={() => handleRemoveList(list.id)}>
 							<FontAwesomeIcon icon={['fas', 'trash-alt']}/>
 						</button>
 					</div>
@@ -366,7 +368,6 @@ const ListApp = forwardRef((props, ref) => {
 	// ---------------------------------------------
 	// Render
 	// ---------------------------------------------
-
 	return (
 		<div className="list-app-card card shadow mb-4">
 			<div className='list-app-header card-header py-3 d-flex flex-row align-items-center justify-content-between'>
@@ -379,22 +380,22 @@ const ListApp = forwardRef((props, ref) => {
 			<div className="modal fade" id="newListModal" tabIndex="-1" role="dialog" aria-labelledby="newListModal" aria-hidden="true">
 				<div className="modal-dialog modal-dialog-centered" role="document">
 					<div className="modal-content">
-						<div className="modal-header">
-							<h5 className="modal-title">Enter List Name</h5>
+						<div className="modal-header px-4 py-2 pt-3" style={{backgroundColor: '#ecf4ff'}}>
+							<h6 className="modal-title">Add a new list</h6>
 							<button type="button" className="close" data-dismiss="modal" aria-label="Close">
 								<span aria-hidden="true">&times;</span>
 							</button>
 						</div>
 						<form onSubmit={handleListTitleSubmit}>
-							<div className="modal-body">
-								<div className="form-group">
-									<label htmlFor="list-title" className="col-form-label" aria-label="List Name" style={{display: 'hidden'}}></label>
-									<input type="text" className="form-control" id="list-title" placeholder="Movies to Watch" value={listTitleInput} onChange={({ target }) => setListTitleInput(target.value)}/>
+							<div className="modal-body px-4 py-4">
+								<div className="form-group mb-0">
+									<label htmlFor="list-title" className="col-form-label" aria-label="List name" style={{display: 'none'}}></label>
+									<input ref={input => input && input.focus()} required type="text" className="form-control" id="list-title" placeholder="List name" value={listTitleInput} onChange={({ target }) => setListTitleInput(target.value)}/>
 								</div>
 							</div>
 							<div className="modal-footer">
-								<button type="button" className="btn btn-secondary" data-dismiss="modal">Close</button>
-								<button type="submit" className="btn btn-primary">Save changes</button>
+								<button type="button" className="btn list-app-btn-grey mr-2" data-dismiss="modal">Cancel</button>
+								<button type="submit" className="btn new-list-item-btn-blue">Save</button>
 							</div>
 						</form>
 					</div>

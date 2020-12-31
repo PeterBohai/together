@@ -67,7 +67,19 @@ export const authSignup = (firstName, lastName, username, email, password1, pass
 					.then(res => {
 						localStorage.setItem('user', JSON.stringify(res.data));
 						console.log('user data', res.data);
-						return {success: true};
+						console.log(res.data.username);
+						axios.get(`http://127.0.0.1:8000/api/user-info/${res.data.username}`)
+							.then(result => {
+								const userData = {
+									...res.data,
+									...result.data
+								};
+								localStorage.setItem('user', JSON.stringify(userData));
+								console.log('Retrieved user info');
+								return {success: true};
+							})
+							.catch(err => {console.log('Error getting user info');});
+						
 					})
 					.catch(err => {
 						console.log('failed getting user data', err.response);
@@ -103,9 +115,21 @@ export const authLogin = (username, password) => {
 				return axios.get('http://127.0.0.1:8000/rest-auth/user/', {
 					headers: {'Authorization': 'Token ' + token}
 				})
-					.then(res => {
+					.then(async (res) => {
 						localStorage.setItem('user', JSON.stringify(res.data));
-						return {success: true};
+						console.log('user data', res.data);
+						console.log(res.data.username);
+						await axios.get(`http://127.0.0.1:8000/api/user-info/${res.data.username}`)
+							.then(result => {
+								const userData = {
+									...res.data,
+									...result.data
+								};
+								localStorage.setItem('user', JSON.stringify(userData));
+								console.log('Retrieved user info');
+								return {success: true};
+							})
+							.catch(err => {console.log('Error getting user info');});
 					})
 					.catch(err => {
 						console.log('failed getting user data', err.response);

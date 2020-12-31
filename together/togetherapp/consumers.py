@@ -48,13 +48,14 @@ class RoomConsumer(WebsocketConsumer):
 
     def remove_list_item(self, data):
         item_id = data['item_id']
-        list_id = ListItem.objects.get(pk=item_id).list.id
-        ListItem.objects.filter(pk=item_id).delete()
+        item = ListItem.objects.get(pk=item_id)
         content = {
             'command': 'removed_list_item',
             'item_id': item_id,
-            'list_id': list_id
+            'list_id': item.list.id
         }
+
+        item.delete()
         return self.send_delete_list_item(content)
 
     def new_list_item(self, data):
@@ -166,8 +167,9 @@ class RoomConsumer(WebsocketConsumer):
     # Receive from WebSocket and send to other servers in the same group
     # ----------------------------------------------------------------
     def receive(self, text_data):
-        print('TEXT DATA', text_data)
+
         data = json.loads(text_data)
+        print('TEXT DATA', data['command'])
         self.commands[data['command']](self, data)
 
     def send_one_list(self, content):

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import User, RelationshipTip, Room, List, ListItem
+from .models import User, RelationshipTip, Room, List, ListItem, QuizQuestion, QuizAnswer
 
 
 class UserAdmin(admin.ModelAdmin):
@@ -34,8 +34,24 @@ class ListItemAdmin(admin.ModelAdmin):
         return obj.content[:20] + ('...' if len(obj.content) > 20 else '')
 
 
+class QuizQuestionAdmin(admin.ModelAdmin):
+    list_display = ("pk", "category", "question")
+
+
+class QuizAnswerAdmin(admin.ModelAdmin):
+    list_display = ("pk", "get_user", "get_question", 'partner_answered')
+
+    def get_user(self, obj):
+        return obj.user.username
+
+    def get_question(self, obj):
+        return obj.question.pk
+
+
 admin.site.register(User, UserAdmin)
 admin.site.register(RelationshipTip, RelationshipTipAdmin)
 admin.site.register(Room, RoomAdmin)
 admin.site.register(List, ListAdmin)
 admin.site.register(ListItem, ListItemAdmin)
+admin.site.register(QuizQuestion, QuizQuestionAdmin)
+admin.site.register(QuizAnswer, QuizAnswerAdmin)

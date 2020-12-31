@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.utils import timezone
 
 
 class Room(models.Model):
@@ -60,11 +61,15 @@ class ListItem(models.Model):
         return f"{self.pk}: {self.content[:12] + ('...' if len(self.content) > 12 else '')} [{self.list.title}]"
 
 
+def default_room():
+    return Room.objects.create(name='room').pk
+
+
 class User(AbstractUser):
-    room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name='participants', null=True, blank=True)
+    room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name='participants', default=default_room)
 
 
-class RelationshipTip(models.Model):
+class Category:
     INFORMATION = 'INF'
     COMMUNICATION = 'COM'
     SEX = 'SEX'
@@ -72,13 +77,16 @@ class RelationshipTip(models.Model):
     RECREATION = 'REC'
     RESPONSIBILITY = 'RES'
 
+
+class RelationshipTip(models.Model):
+
     CATEGORY_CHOICES = [
-        (INFORMATION, 'Information'),
-        (COMMUNICATION, 'Communication'),
-        (SEX, 'Sex'),
-        (EMOTIONAL, 'Emotional'),
-        (RECREATION, 'Recreation'),
-        (RESPONSIBILITY, 'Responsibility')
+        (Category.INFORMATION, 'Information'),
+        (Category.COMMUNICATION, 'Communication'),
+        (Category.SEX, 'Sex'),
+        (Category.EMOTIONAL, 'Emotional'),
+        (Category.RECREATION, 'Recreation'),
+        (Category.RESPONSIBILITY, 'Responsibility')
     ]
 
     title = models.CharField(max_length=200)
@@ -87,11 +95,58 @@ class RelationshipTip(models.Model):
     category = models.CharField(
         max_length=3,
         choices=CATEGORY_CHOICES,
-        default=INFORMATION,
+        default=Category.INFORMATION,
     )
 
     def __str__(self):
         return f"{self.pk}: {self.category}: {self.title}"
+
+
+class QuizQuestion(models.Model):
+
+    CATEGORY_CHOICES = [
+        (Category.INFORMATION, 'Information'),
+        (Category.COMMUNICATION, 'Communication'),
+        (Category.SEX, 'Sex'),
+        (Category.EMOTIONAL, 'Emotional'),
+        (Category.RECREATION, 'Recreation'),
+        (Category.RESPONSIBILITY, 'Responsibility')
+    ]
+
+    category = models.CharField(
+        max_length=3,
+        choices=CATEGORY_CHOICES,
+        default=Category.INFORMATION,
+    )
+    question = models.CharField(max_length=200)
+    option1 = models.CharField(max_length=100)
+    option2 = models.CharField(max_length=100)
+    option3 = models.CharField(max_length=100)
+    option4 = models.CharField(max_length=100)
+
+    def __str__(self):
+        return f"{self.pk}: {self.question}"
+
+
+class QuizAnswer(models.Model):
+    OPTION_1 = 1
+    OPTION_2 = 2
+    OPTION_3 = 3
+    OPTION_4 = 4
+    ANSWER_CHOICES = [
+        (OPTION_1, 'Option 1'),
+        (OPTION_2, 'Option 2'),
+        (OPTION_3, 'Option 3'),
+        (OPTION_4, 'Option 4'),
+    ]
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_quiz_answers')
+    question = models.ForeignKey(QuizQuestion, on_delete=models.CASCADE, related_name='question_answers')
+    answer = models.IntegerField(choices=ANSWER_CHOICES, blank=False)
+    partner_answered = models.BooleanField(default=False)
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"[pk: {self.pk}] [user:{self.user.username}] [question fk: {self.question.pk}]"
 
 
 class Message(models.Model):

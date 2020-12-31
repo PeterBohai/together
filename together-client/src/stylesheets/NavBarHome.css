@@ -28,3 +28,61 @@
 	color: white!important;
 	border-color: transparent;
 }
+
+.user-profile {
+	font-size: 14px;
+}
+
+.user-profile-pic {
+	height: 38px;
+	width: 38px;
+	border-radius: 50%;
+	background: url('../images/small_profile.png');
+	background-size: contain; 
+	background-repeat:no-repeat;
+    background-position: center center;
+
+}
+
+.dropdown-menu {
+	border: 1px solid #e3e6f0;
+}
+
+.card {
+	border: none;
+}
+
+.dropdown .dropdown-menu {
+	font-size: 0.9rem;
+	color: gray;
+}
+
+.dropdown-item {
+	color: #3a3b45;
+}
+
+.dropdown-item:active {
+	background-color: #ff0048;
+}
+
+.dropdown-item-icon {
+	color: #d1d3e2;
+}
+
+.dropdown-item:hover .dropdown-item-icon {
+	color: #a1a2a8;
+}
+
+.user-profile-name {
+	color: rgb(71, 71, 71);
+}
+
+.user-profile {
+	opacity: 70%;
+}
+
+.user-profile:hover,
+.user-profile:focus {
+	opacity: 100%;
+	box-shadow: none;
+}

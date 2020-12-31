@@ -217,3 +217,28 @@ label.list-checkbox-label {
 .pad-bot {
 	padding-bottom: 110px!important;
 }
+
+.new-list-item-btn-blue {
+	height: 31px;
+	padding: 3px 17px;
+	border-radius: 3px;
+	font-size: 14px;
+	font-weight: bold;
+	border: none;
+	color: white;
+	background-color: #4e73df;
+	border-bottom: 4px solid #4260bc;
+}
+.new-list-item-btn-blue:hover {
+	color: white;
+	border-width: 2px;
+}
+.new-list-item-btn-blue:active {
+	border-width: 1px;
+}
+
+.modal-title {
+    margin-bottom: 0;
+	line-height: 1.5;
+	font-size: 1.1rem;
+}
