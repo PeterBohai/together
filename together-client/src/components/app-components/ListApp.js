@@ -14,8 +14,8 @@ const ListApp = forwardRef((props, ref) => {
 	useEffect(() => {
 		if (!ws.current) return;
 
-		ws.current.addEventListener('message', event => {
-			const data = JSON.parse(event.data);
+		ws.current.onmessage = e => {
+			const data = JSON.parse(e.data);
 			console.log('onmessage data in ListApp:', data);
 
 			if (data.command === 'fetched_lists') {
@@ -86,9 +86,9 @@ const ListApp = forwardRef((props, ref) => {
 			else {
 				console.log('data.command invalid or not set');
 			}
-		});
+		};
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, []);
+	}, [roomLists, currentListItems]);
 	
 	// ---------------------------------------------
 	// Handler Functions

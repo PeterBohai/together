@@ -23,18 +23,6 @@ const QuizApp = forwardRef((props, ref) => {
 	const [displayMatch, setDisplayMatch] = useState(false);
 	const [partnerAnswer, setPartnerAnswer] = useState(-1);
 	const [matchedPartner, setMatchedPartner] = useState(false);
-	const ws = ref;
-	
-	// Setup WebSocket event listener for incoming messages
-	useEffect(() => {
-		if (!ws.current) return;
-		
-		ws.current.addEventListener('message', event => {
-			const data = JSON.parse(event.data);
-			console.log('onmessage data:', data);
-		});
-		
-	}, []);
 
 	// Retrieve the daily tip from the server
 	useEffect(() => {
@@ -61,7 +49,7 @@ const QuizApp = forwardRef((props, ref) => {
 			// Check if timestamp of the first question is less than 24 hours old
 			const ONE_DAY = 60 * 60 * 24 * 1000;
 			let questionTimestamp = new Date(newQuestions[0].timestamp);
-			if ((new Date) - questionTimestamp < ONE_DAY) {
+			if ((new Date()) - questionTimestamp < ONE_DAY) {
 				console.log('Completed all questions for the day.');
 				setDisplayComplete(true);
 				return;
@@ -239,11 +227,11 @@ const QuizApp = forwardRef((props, ref) => {
 								{newQuestions.length > 0 && questionsIndex < newQuestions.length 
 									? num === 1 
 										? newQuestions[questionsIndex].option1 
-										: num == 2
+										: num === 2
 											? newQuestions[questionsIndex].option2
-											: num == 3
+											: num === 3
 												? newQuestions[questionsIndex].option3
-												: num == 4
+												: num === 4
 													? newQuestions[questionsIndex].option4
 													: null
 									: null}
@@ -280,11 +268,11 @@ const QuizApp = forwardRef((props, ref) => {
 								{newQuestions.length > 0 && questionsIndex < newQuestions.length
 									? num === 1 
 										? newQuestions[questionsIndex].option1 
-										: num == 2
+										: num === 2
 											? newQuestions[questionsIndex].option2
-											: num == 3
+											: num === 3
 												? newQuestions[questionsIndex].option3
-												: num == 4
+												: num === 4
 													? newQuestions[questionsIndex].option4
 													: null
 									: null}

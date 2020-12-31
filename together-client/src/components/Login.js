@@ -1,5 +1,5 @@
 import React, { useState , useEffect } from 'react';
-import { Link, useHistory, useLocation } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import { connect } from 'react-redux';
 import * as actions from '../store/actions/auth';
 import PropTypes from 'prop-types';
@@ -13,7 +13,6 @@ const Login = (props) => {
 	const [password, setPassword] = useState('');
 	const [errorMessages, setErrorMessages] = useState([]);
 	const history = useHistory();
-	const location = useLocation();
 
 	useEffect(() => {
 		if (props.isAuthenticated) {

@@ -53,19 +53,10 @@ const CanvasApp = forwardRef(({ width, height, userInfo}, ref) => {
 			img.onload = () => {
 				contextRef.current.drawImage(img, 0, 0, width, height);
 			};
-
-			// (Ideally) Sync every drawing coordinate and event for smoother real-time interaction
-
-			// console.log('RECEIVing CanvasApp Event useEffect', canvasEvent);
-			// if (canvasEvent.status === 'start') {
-			// 	const mouseCoords = {offsetX: canvasEvent.offset_x, offsetY: canvasEvent.offset_y};
-			// 	startDrawing(mouseCoords, canvasEvent.username);
-			// } else if (canvasEvent.status === 'drawing') {
-			// 	const mouseCoords = {offsetX: canvasEvent.offset_x, offsetY: canvasEvent.offset_y};
-			// 	handleDraw(mouseCoords, canvasEvent.username);
-			// } else if (canvasEvent.status === 'stop') {
-			// 	finishDrawing(canvasEvent.username);
-			// }
+			if (canvasServerEvent.clear) {
+				localStorage.removeItem('roomCanvas');
+				contextRef.current.clearRect(0, 0, width, height);
+			}
 		}
 	}, [canvasServerEvent]);
 
@@ -74,6 +65,7 @@ const CanvasApp = forwardRef(({ width, height, userInfo}, ref) => {
 		if (strokeMode === 'clear') {
 			localStorage.removeItem('roomCanvas');
 			contextRef.current.clearRect(0, 0, width, height);
+			updateMousePos({status: canvasRef.current.toDataURL(), clear: true});
 			changeModeToDraw();
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -89,7 +81,7 @@ const CanvasApp = forwardRef(({ width, height, userInfo}, ref) => {
 
 			if(data.command === 'new_canvas_coords' && data.username !== userInfo.username) {
 				setCanvasServerEvent(data);
-				console.log('new_canvas_coords RECEIVED', canvasServerEvent);
+				console.log('new_canvas_coords RECEIVED', data);
 			} else {
 				console.log('command either for ListApp or invalid');
 			}
@@ -114,7 +106,7 @@ const CanvasApp = forwardRef(({ width, height, userInfo}, ref) => {
 	const finishDrawing = (username) => {
 		contextRef.current.closePath();
 		if (username === userInfo.username) {
-			updateMousePos({status: canvasRef.current.toDataURL()});
+			updateMousePos({status: canvasRef.current.toDataURL(), clear: false});
 		}
 		// save drawing to be loaded again when page is refreshed
 		localStorage.setItem('roomCanvas', canvasRef.current.toDataURL());
@@ -163,7 +155,8 @@ const CanvasApp = forwardRef(({ width, height, userInfo}, ref) => {
 				username: userInfo.username,
 				offset_x: mouseEvent.offsetX,
 				offset_y: mouseEvent.offsetY,
-				status: mouseEvent.status
+				status: mouseEvent.status,
+				clear: mouseEvent.clear
 			}));	
 		}
 	};

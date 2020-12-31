@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import NavBarHome from './NavBarHome';
 import CanvasApp from './app-components/CanvasApp';
@@ -83,7 +82,7 @@ const Room = (props) => {
 			<NavBarHome {...props} userInfo={userInfo} />
 			
 			<div className="upper-container row mt-4" style={{margin: '0'}}>
-				<div className="col-lg-9 canvas-card-wrapper p-5">
+				<div className="col-lg-12 canvas-card-wrapper p-5">
 					{wsRefReady ? 
 						<CanvasApp 
 							width={1000} height={330} 
@@ -91,56 +90,6 @@ const Room = (props) => {
 							ref={ws}
 						/> 
 						: null}
-				</div>
-
-				<div className={statCardContainerClasses}>
-					<div className="mb-4">
-						<div id="top-data-card" className="data-card card border-left-primary  h-100 py-2">
-							<div className="card-body">
-								<div className="row no-gutters align-items-center">
-									<div className="col mr-2">
-										<div className="text-xs font-weight-bold text-red mb-1">Days Together</div>
-										<div className="h5 mb-0 font-weight-bold text-gray-800">N/A</div>
-									</div>
-									<div id="top-data-card-icon" className="data-card-icon col-auto">
-										<FontAwesomeIcon icon={['fas', 'heart']} />
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-
-					<div className="mb-4">
-						<div id="middle-data-card" className="data-card card border-left-primary h-100 py-2">
-							<div className="card-body">
-								<div className="row no-gutters align-items-center">
-									<div className="col mr-2">
-										<div className="text-xs font-weight-bold text-blue mb-1">Anniversary Date</div>
-										<div className="h5 mb-0 font-weight-bold text-gray-800">23</div>
-									</div>
-									<div id="middle-data-card-icon" className="data-card-icon col-auto">
-										<FontAwesomeIcon icon={['fas', 'address-card']} />
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-
-					<div className="mb-4">
-						<div id="bottom-data-card" className="data-card card border-left-primary  h-100 py-2">
-							<div className="card-body">
-								<div className="row no-gutters align-items-center">
-									<div className="col mr-2">
-										<div className="text-xs font-weight-bold text-green mb-1">Partner Status</div>
-										<div className="h5 mb-0 font-weight-bold text-gray-800">Online</div>
-									</div>
-									<div id="bottom-data-card-icon" className="data-card-icon col-auto">
-										<FontAwesomeIcon icon={['fas', 'comment']} />
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
 				</div>
 			</div>
 			
