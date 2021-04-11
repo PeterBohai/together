@@ -32,13 +32,13 @@ const App = (props) => {
 				<Route exact path="/login">
 					<Login {...props}/>
 				</Route>
-				{/* <PublicRoute exact path="/login" {...props} comp={Login} ></PublicRoute> */}
-				{/* <PublicRoute exact path="/register" {...props} comp={Register} ></PublicRoute> */}
+
 				<Route exact path="/register">
 					<Register {...props}/>
 				</Route>
-				<PrivateRoute path="/room" {...props} comp={Room} >
-				</PrivateRoute>
+
+				<PrivateRoute path="/room" {...props} comp={Room} ></PrivateRoute>
+				
 				<PublicRoute exact path="/" {...props} comp={Home} ></PublicRoute>
 			</Switch>
 		</Router>

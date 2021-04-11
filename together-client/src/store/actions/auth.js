@@ -1,6 +1,11 @@
 import * as actionTypes from './actionTypes';
 import axios from 'axios';
 
+// time constants in seconds
+const ONE_MINUTE = 60;
+const ONE_HOUR = 60 * ONE_MINUTE;
+const ONE_DAY = 24 * ONE_HOUR;
+
 export const authStart = () => {
 	return {
 		type: actionTypes.AUTH_START
@@ -38,9 +43,20 @@ export const checkAuthTimeout = (expirationTime) => {
 	};
 };
 
+const storeTokenAndDispatch = (dispatch, token, expirationTime) => {
+	const expirationDate = new Date(new Date().getTime() + ONE_DAY * 1000);
+	
+	localStorage.setItem('token', token);
+	localStorage.setItem('expirationDate', expirationDate);
+	
+	dispatch(authSuccess(token));
+	dispatch(checkAuthTimeout(expirationTime));
+};
+
 export const authSignup = (firstName, lastName, username, email, password1, password2) => {
 	return dispatch => {
 		dispatch(authStart());
+		
 		return axios.post('http://127.0.0.1:8000/rest-auth/registration/', {
 			first_name: firstName,
 			last_name: lastName,
@@ -53,22 +69,17 @@ export const authSignup = (firstName, lastName, username, email, password1, pass
 			
 				const token = res.data.key;
 
-				// 1hr long expiration date
-				const expirationDate = new Date(new Date().getTime() + 24 * 3600 * 1000);
-				localStorage.setItem('token', token);
-				localStorage.setItem('expirationDate', expirationDate);
-				dispatch(authSuccess(token));
-				dispatch(checkAuthTimeout(3600));  // 3600 seconds
+				storeTokenAndDispatch(dispatch, token, ONE_HOUR);
 				
 				// Store basic user info in localstorage as well
 				return axios.get('http://127.0.0.1:8000/rest-auth/user/', {
 					headers: {'Authorization': 'Token ' + token}
 				})
-					.then(res => {
+					.then(async (res) => {
 						localStorage.setItem('user', JSON.stringify(res.data));
 						console.log('user data', res.data);
 						console.log(res.data.username);
-						axios.get(`http://127.0.0.1:8000/api/user-info/${res.data.username}`)
+						await axios.get(`http://127.0.0.1:8000/api/user-info/${res.data.username}`)
 							.then(result => {
 								const userData = {
 									...res.data,
@@ -79,7 +90,6 @@ export const authSignup = (firstName, lastName, username, email, password1, pass
 								return {success: true};
 							})
 							.catch(err => {console.log('Error getting user info');});
-						
 					})
 					.catch(err => {
 						console.log('failed getting user data', err.response);
@@ -97,6 +107,7 @@ export const authSignup = (firstName, lastName, username, email, password1, pass
 export const authLogin = (username, password) => {
 	return dispatch => {
 		dispatch(authStart());
+
 		return axios.post('http://127.0.0.1:8000/rest-auth/login/', {
 			username, 
 			password
@@ -104,12 +115,7 @@ export const authLogin = (username, password) => {
 			.then(res => {
 				const token = res.data.key;
 
-				// 1hr long expiration date
-				const expirationDate = new Date(new Date().getTime() + 24 * 3600 * 1000);
-				localStorage.setItem('token', token);
-				localStorage.setItem('expirationDate', expirationDate);
-				dispatch(authSuccess(token));
-				dispatch(checkAuthTimeout(3600));  // 3600 seconds
+				storeTokenAndDispatch(dispatch, token, ONE_HOUR);
 				
 				// Store basic user info in localstorage as well
 				return axios.get('http://127.0.0.1:8000/rest-auth/user/', {

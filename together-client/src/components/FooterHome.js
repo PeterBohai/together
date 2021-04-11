@@ -10,8 +10,8 @@ const FooterHome = () => {
 	return (
 		<footer className={footerClasses}>
 			<div className="container footer-container text-center">
-				<div className="row align-itens-center">
-					<div className="col-lg-4 text-lg-left">Copyright 2020 © Together</div>
+				<div className="row align-items-center">
+					<div className="col-lg-4 text-lg-left">Copyright 2021 © Peter Hu</div>
 					<div className="col-lg-4 my-2 my-lg-0">
 						<a className="btn-social mx-2" id="github-icon" href="https://github.com/PeterBohai"><FontAwesomeIcon icon={['fab', 'github']}/></a>
 						<a className="btn-social mx-2" id="linkedin-icon" href="https://www.linkedin.com/in/peterhu08"><FontAwesomeIcon icon={['fab', 'linkedin']}/></a>

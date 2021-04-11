@@ -15,6 +15,7 @@ const Login = (props) => {
 	const history = useHistory();
 
 	useEffect(() => {
+		// Immediately redirect user back to the Room page if they are logged in
 		if (props.isAuthenticated) {
 			history.push('/room');
 		}
@@ -22,9 +23,10 @@ const Login = (props) => {
 	
 	const handleLogin = (event) => {
 		event.preventDefault();
+		
 		props.onAuth(username, password)
 			.then(res => {
-				// replace the current path with the previous page since going back to the Login page after authentication doesn't make sense
+				// Replace the current path with the Room page so clicking "back" will not go back to the Login page
 				console.log(res);
 				history.push('/room');
 			})
@@ -36,9 +38,7 @@ const Login = (props) => {
 				setErrorMessages(errors);
 			});
 	};
-	if (props.isAuthenticated) {
-		return(<div></div>);
-	}
+
 	return (
 		<div className="login-page text-center">
 			<NavBarHome />

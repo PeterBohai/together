@@ -97,6 +97,12 @@ class RoomConsumer(WebsocketConsumer):
     def new_canvas_coords(self, data):
         return self.send_canvas_coords(data)
 
+    def no_command_keyerror(self, data):
+        content = {
+            'error': 'KeyError: No command field in data'
+        }
+        return self.send_message(content)
+
     # -------------
     # Serializers
     # ------------
@@ -136,7 +142,7 @@ class RoomConsumer(WebsocketConsumer):
     # Websocket connection
     # ---------------------
 
-    commands = {
+    actions = {
         'fetch_lists': fetch_lists,
         'get_list_items': get_list_items,
         'new_list': new_list,
@@ -146,11 +152,12 @@ class RoomConsumer(WebsocketConsumer):
         'update_item_checked': update_item_checked,
         'update_item_content': update_item_content,
         'new_canvas_coords': new_canvas_coords,
+        'no_command_KeyError': no_command_keyerror
     }
 
     def connect(self):
         self.room_name = self.scope['url_route']['kwargs']['room_name']
-        self.room_group_name = 'chat_%s' % self.room_name
+        self.room_group_name = f'chat_{self.room_name}'
         async_to_sync(self.channel_layer.group_add)(
             self.room_group_name,
             self.channel_name
@@ -167,15 +174,28 @@ class RoomConsumer(WebsocketConsumer):
     # Receive from WebSocket and send to other servers in the same group
     # ----------------------------------------------------------------
     def receive(self, text_data):
-
         data = json.loads(text_data)
-        print('TEXT DATA', data['command'])
-        self.commands[data['command']](self, data)
+        print('text_data received: ', text_data)
+
+        try:
+            action = data.get('command', 'no_command_KeyError')
+            self.actions[action](self, data)
+        except KeyError as key:
+            print(f'KeyError: Could not find {key} in actions list')
+
 
     def send_one_list(self, content):
         async_to_sync(self.channel_layer.group_send)(
             self.room_group_name, {
                 'type': 'one_list',
+                'content': content
+            }
+        )
+
+    def send_message(self, content):
+        async_to_sync(self.channel_layer.group_send)(
+            self.room_group_name, {
+                'type': 'message',
                 'content': content
             }
         )
@@ -222,5 +242,9 @@ class RoomConsumer(WebsocketConsumer):
         self.send(text_data=json.dumps(content))
 
     def canvas_coords(self, event):
+        content = event['content']
+        self.send(text_data=json.dumps(content))
+
+    def message(self, event):
         content = event['content']
         self.send(text_data=json.dumps(content))

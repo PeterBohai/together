@@ -39,6 +39,10 @@ body {
 	font-weight: 700;
 }
 
+.title-blurb {
+	font-size: 1.35rem;
+}
+
 .btn-danger,
 .btn-danger:not(:disabled):not(.disabled):active:focus,
 .btn-danger:focus {
