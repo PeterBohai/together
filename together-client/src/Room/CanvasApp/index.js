@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, forwardRef } from 'react';
 import PropTypes from 'prop-types';
-import '../../stylesheets/CanvasApp.css';
+import './CanvasApp.css';
 
 const CanvasApp = forwardRef(({ width, height, userInfo}, ref) => {
 	const canvasRef = useRef(null);

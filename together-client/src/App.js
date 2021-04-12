@@ -7,13 +7,13 @@ import { fas } from '@fortawesome/free-solid-svg-icons';
 import { fab } from '@fortawesome/free-brands-svg-icons';
 import PropTypes from 'prop-types';
 
-import PrivateRoute from './components/PrivateRoute';
-import PublicRoute from './components/PublicRoute';
-import Home from './components/Home';
-import Login from './components/Login';
-import Register from './components/Register';
-import Room from './components/Room';
-import './stylesheets/App.css';
+import PrivateRoute from './shared/PrivateRoute';
+import PublicRoute from './shared/PublicRoute';
+import Home from './Home';
+import Login from './user/Login';
+import Register from './user/Register';
+import Room from './Room';
+import './App.css';
 
 // Load Font Awesome brand and solid icons
 library.add(fab);

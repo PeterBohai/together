@@ -1,8 +1,8 @@
 import React from 'react';
 import {Link} from 'react-router-dom';
-import NavBarHome from './NavBarHome';
-import FooterHome from './FooterHome';
-import '../stylesheets/Home.css';
+import NavBarHome from '../shared/NavBarHome';
+import FooterHome from '../shared/FooterHome';
+import './Home.css';
 
 const Home = (props) => {
 	return (

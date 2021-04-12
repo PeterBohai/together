@@ -2,7 +2,7 @@ import React, { useState, useEffect, forwardRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import PropTypes from 'prop-types';
 import axios from 'axios';
-import '../../stylesheets/QuizApp.css';
+import './QuizApp.css';
 
 const QuizApp = forwardRef((props, ref) => {
 	const [dailyTip, setDailyTip] = useState({});

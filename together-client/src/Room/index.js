@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 
-import NavBarHome from './NavBarHome';
-import CanvasApp from './app-components/CanvasApp';
-import QuizApp from './app-components/QuizApp';
-import ListApp from './app-components/ListApp';
-import FooterHome from './FooterHome';
-import '../stylesheets/Room.css';
+import NavBarHome from '../shared/NavBarHome';
+import CanvasApp from './CanvasApp';
+import QuizApp from './QuizApp';
+import ListApp from './ListApp';
+import FooterHome from '../shared/FooterHome';
+import './Room.css';
 
 const Room = (props) => {
 	const [userInfo, setUserInfo] = useState({});

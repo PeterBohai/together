@@ -1,6 +1,6 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import '../stylesheets/FooterHome.css';
+import './FooterHome.css';
 
 const FooterHome = () => {
 	const footerClasses = window.location.pathname === '/' 

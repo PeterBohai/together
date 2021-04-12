@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useHistory, useLocation }  from 'react-router-dom';
 import { connect } from 'react-redux';
-import * as actions from '../store/actions/auth';
+import * as actions from '../../store/actions/auth';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import PropTypes from 'prop-types';
-import NavBarHome from './NavBarHome';
-import '../stylesheets/Register.css';
+import NavBarHome from '../../shared/NavBarHome';
+import './Register.css';
   
 
 const Register = (props) => {

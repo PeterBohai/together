@@ -1,12 +1,12 @@
 import React, { useState }from 'react';
 import { Link, useHistory }  from 'react-router-dom';
 import { connect } from 'react-redux';
-import * as actions from '../store/actions/auth';
+import * as actions from '../../store/actions/auth';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 import $ from 'jquery';
-import '../stylesheets/NavBarHome.css';
+import './NavBarHome.css';
 
 const NavBarHome = (props) => {
 	const history = useHistory();

@@ -1,11 +1,11 @@
 import React, { useState , useEffect } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 import { connect } from 'react-redux';
-import * as actions from '../store/actions/auth';
+import * as actions from '../../store/actions/auth';
 import PropTypes from 'prop-types';
-import NavBarHome from './NavBarHome';
-import FooterHome from './FooterHome';
-import '../stylesheets/Login.css';
+import NavBarHome from '../../shared/NavBarHome';
+import FooterHome from '../../shared/FooterHome';
+import './Login.css';
 
 
 const Login = (props) => {

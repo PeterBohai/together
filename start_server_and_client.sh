@@ -19,6 +19,9 @@ brew services start mysql
 # Redis is needed for Django Channel (Websocket Django package)
 brew services start redis
 
+# Give time for serveices to start up
+sleep 3
+
 # -----------------------
 #  Start Django Backend 
 # -----------------------

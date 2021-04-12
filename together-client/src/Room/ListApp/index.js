@@ -2,7 +2,7 @@ import React, { useState, useEffect, forwardRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import PropTypes from 'prop-types';
 import $ from 'jquery';
-import '../../stylesheets/ListApp.css';
+import './ListApp.css';
 
 const ListApp = forwardRef((props, ref) => {
 	const [roomLists, setRoomLists] = useState([]);
