@@ -37,7 +37,7 @@
 	height: 38px;
 	width: 38px;
 	border-radius: 50%;
-	background: url('../../images/small_profile.png');
+	background: url('/small_profile.png');
 	background-size: contain; 
 	background-repeat:no-repeat;
     background-position: center center;
