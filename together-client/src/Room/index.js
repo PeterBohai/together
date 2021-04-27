@@ -27,7 +27,7 @@ const Room = (props) => {
 	const [wsRefReady, setWsRefReady] = useState(false);
 	useEffect(() => {
 		let wsScheme = window.location.protocol === 'https:' ? 'wss' : 'ws';
-		let roomName = userInfo.user_room_pk || JSON.parse(localStorage.getItem('user')).user_room_pk;
+		let roomName = userInfo.room_id || JSON.parse(localStorage.getItem('user')).room_id;
 		let host = '127.0.0.1:8000';
 		let wsUrl = `${wsScheme}://${host}/ws/room/${roomName}/`;
 		ws.current = new WebSocket(wsUrl);

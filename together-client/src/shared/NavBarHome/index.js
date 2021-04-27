@@ -22,14 +22,14 @@ const NavBarHome = (props) => {
 		event.preventDefault();
 		
 		axios.put(`http://127.0.0.1:8000/api/user-info/${props.userInfo.username}`, {
-			user_room_pk: roomNumberInput
+			room_id: roomNumberInput
 		})
 			.then(result => {
 				console.log('Connecting to room status: ' + result.data.status);
 				
 				const user = JSON.parse(localStorage.getItem('user'));
 				console.log(user);
-				user.user_room_pk = roomNumberInput;
+				user.room_id = roomNumberInput;
 				console.log(user);
 				localStorage.setItem('user', JSON.stringify(user));
 				console.log(localStorage);
@@ -72,7 +72,7 @@ const NavBarHome = (props) => {
 						Connect partner
 					</div>
 					<div className="dropdown-item">
-						My Room #: {props.userInfo.user_room_pk}
+						My Room #: {props.userInfo.room_id}
 					</div>
 				</div>
 			</div>
