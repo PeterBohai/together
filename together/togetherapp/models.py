@@ -1,6 +1,5 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-from django.utils import timezone
 
 
 class Room(models.Model):
@@ -61,12 +60,12 @@ class ListItem(models.Model):
         return f"{self.pk}: {self.content[:12] + ('...' if len(self.content) > 12 else '')} [{self.list.title}]"
 
 
-def default_room():
+def get_default_room_pk():
     return Room.objects.create(name='room').pk
 
 
 class User(AbstractUser):
-    room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name='participants', default=default_room)
+    room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name='participants', default=get_default_room_pk)
 
 
 class Category:

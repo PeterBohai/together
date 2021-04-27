@@ -164,3 +164,8 @@ CORS_ALLOW_ALL_ORIGINS = True
 ACCOUNT_AUTHENTICATION_METHOD = 'username'
 ACCOUNT_EMAIL_VERIFICATION = 'none'
 ACCOUNT_ADAPTER = 'togetherapp.adapters.CustomUserAccountAdapter'
+
+# Custom Django Rest Auth Serializers
+REST_AUTH_SERIALIZERS = {
+    'USER_DETAILS_SERIALIZER': 'togetherapp.api.serializers.UserDetailsSerializer'
+}

@@ -34,12 +34,12 @@ def user_info(request, username):
     if request.method == 'GET':
         user = User.objects.get(username=username)
         return JsonResponse({
-            'user_room_pk': user.room.pk
+            'room_id': user.room.pk
         })
     elif request.method == 'PUT':
         room_data = JSONParser().parse(request)
         user = User.objects.get(username=username)
-        user.room = Room.objects.get(pk=room_data['user_room_pk'])
+        user.room = Room.objects.get(pk=room_data['room_id'])
         user.save()
         return JsonResponse({'status': 'success'})
 

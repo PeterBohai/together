@@ -15,6 +15,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='user',
             name='room',
-            field=models.ForeignKey(default=togetherapp.models.default_room, on_delete=django.db.models.deletion.CASCADE, related_name='participants', to='togetherapp.room'),
+            field=models.ForeignKey(default=togetherapp.models.get_default_room_pk, on_delete=django.db.models.deletion.CASCADE, related_name='participants', to='togetherapp.room'),
         ),
     ]
